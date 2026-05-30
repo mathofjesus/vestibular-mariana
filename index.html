@@ -498,17 +498,21 @@
             if (isOpen) return;
             isOpen = true;
 
-            // Tocar som de papel
-            papel.volume = 0.2;
+            // Tocar som de papel (100% volume)
+            papel.volume = 1.0;
             papel.currentTime = 0;
             papel.play().catch(function() {});
 
             // Abrir aba do envelope
             flap.classList.add('open');
 
-            // Após a aba abrir, esconder envelope e mostrar carta
-            setTimeout(function() {
-                // Tocar música de fundo
+            var flapReady = false;
+            var somReady = false;
+
+            function abrirCarta() {
+                if (!flapReady || !somReady) return;
+
+                // Tocar música de fundo (30% volume)
                 music.volume = 0.3;
                 music.play().catch(function() {});
 
@@ -523,6 +527,18 @@
                     envelope.style.display = 'none';
                     letter.classList.add('show');
                 }, 300);
+            }
+
+            // Quando o som do papel terminar
+            papel.addEventListener('ended', function() {
+                somReady = true;
+                abrirCarta();
+            });
+
+            // Quando a aba terminar de abrir (600ms)
+            setTimeout(function() {
+                flapReady = true;
+                abrirCarta();
             }, 600);
         });
 
